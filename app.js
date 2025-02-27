@@ -1,7 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const feedRoutes = require('./routes/feed');
+
+const MONGODB_URI = 'mongodb+srv://udemyShoppingApp:OMQ7Qw6eU8gz1Ubf@cluster0.zmacg.mongodb.net/messages?retryWrites=true&w=majority&appName=Cluster0'
 
 const app = express();
 
@@ -16,4 +19,9 @@ app.use((req, res, next) => {
 
 app.use('/feed', feedRoutes);
 
-app.listen(8080);
+mongoose
+    .connect(MONGODB_URI)
+    .then(result => {
+        app.listen(8080);
+    })
+    .catch(err => console.log(err));
