@@ -6,41 +6,30 @@ const { validationResult } = require('express-validator');
 const Post = require('../models/post');
 const User = require('../models/user');
 
-exports.getPosts = (req, res, next) => {
+// we can use 'await' here in the top level.
+
+
+exports.getPosts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
   const perPage = 2;
-  let totalItems;
-  Post
-    .find()
-    .countDocuments()
-    .then(countedDocuments => {
-      totalItems = countedDocuments;
-      return Post
-        .find()
-        .skip((currentPage - 1) * perPage)
-        .limit(perPage);
-    })
-    .then(result => {
-      if(result.length === 0) {
-        const error = new Error('Could not find any Posts !!');
-        error.statusCode = 404;
-        throw error;
-      }
-      console.log(result);
-      res
-      .status(200)
-      .json({
-        message: 'Posts fetched.', //optionnal
-        posts: result,
-        totalItems: totalItems,
-      });
-    })
-    .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
+  try {
+    const totalItems = await Post.find().countDocuments();
+    const posts = await Post.find()
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage);
+    res
+    .status(200)
+    .json({
+      message: 'Posts fetched.', //optionnal
+      posts: posts,
+      totalItems: totalItems,
     });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 }
 
 exports.getPost = (req, res, next) => {
