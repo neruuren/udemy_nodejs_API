@@ -25,4 +25,10 @@ router.put('/signup', [
 
 router.post('/login', authController.login);
 
+router.get('/status/:userId', authController.getUserStatus);
+
+router.patch('/status/:userId', [
+    body('status').trim().not().isEmpty(),
+], authController.updateUserStatus);
+
 module.exports = router;
